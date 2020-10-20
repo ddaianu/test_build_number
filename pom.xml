@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>my.test</groupId>
+    <artifactId>git-branch-info</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <scm>
+        <connection>scm:git:ssh://path_not_used_in_buildnumber_example/but_scm_type_is</connection>
+    </scm>
+    <properties>
+        <scala.version>2.11.12</scala.version>
+    </properties>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>4.0.2</version>
+                <executions>
+                    <execution>
+                        <id>git-commit-id</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <!-- Only changing prefix since properties conflicts with jgit above -->
+                            <prefix>git-commit-id</prefix>
+                            <skipPoms>false</skipPoms>
+                            <gitDescribe>
+                                <!-- Faster to get just branch if skip = true -->
+                                <skip>true</skip>
+                            </gitDescribe>
+                            <dotGitDirectory>${project.basedir}/../.git</dotGitDirectory>
+                            <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                            <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>build-info</id>
+                        <goals>
+                            <goal>build-info</goal>
+                        </goals>
+                        <configuration>
+                            <additionalProperties>
+                                <java.version>${java.version}</java.version>
+                                <scala.version>${scala.version}</scala.version>
+                                <scm.commit>${buildNumber}</scm.commit>
+                                <scm.branch>${git-commit-id.branch}</scm.branch>
+                            </additionalProperties>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>echo-properties</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <target>
+                                <echo message="  $${buildNumber}:                  ${buildNumber}" />
+                                <echo message="  $${git-commit-id.branch}:         ${git-commit-id.branch}" />
+                                <echo message="  $${timestamp}:                    ${timestamp}" />
+                                <echo message="  $${Build.BuildNumber}:            ${Build.BuildNumber}" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>
