@@ -93,7 +93,7 @@
                                 <echo message="  $${buildNumber}:                  ${buildNumber}" />
                                 <echo message="  $${git-commit-id.branch}:         ${git-commit-id.branch}" />
                                 <echo message="  $${timestamp}:                    ${timestamp}" />
-                                <echo message="  $${Build.BuildNumber}:            ${Build.BuildNumber}" />
+                                <echo message="  docker-tag:                       ${docker-tag}" />
                             </target>
                         </configuration>
                     </execution>
